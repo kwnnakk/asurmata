@@ -66,47 +66,53 @@ public class Client {
         }
     }
    
-    private static void downloadFilesInSequence() throws IOException, ClassNotFoundException {
-        int fileIndex = 1;
-        int filesDownloaded = 0;
-        int cycle = 1;
-        int filesInCurrentCycle = 0;
+   private static void downloadFilesInSequence() throws IOException, ClassNotFoundException {
+    int fileIndex = 1;
+    int filesDownloaded = 0;
+    int cycle = 1;
+    
+    // ΧΡΟΝΟΜΕΤΡΗΣΗ ΚΥΚΛΩΝ
+    long cycleStartTime = 0;
+    double totalCycleTime = 0;
+    
+    System.out.println("\nStarting download sequence...");
+    
+    while (filesDownloaded < TOTAL_FILES) {
+        cycleStartTime = System.nanoTime();  // Αρχή κύκλου
+        System.out.println("\n--- CYCLE " + cycle + " (Starting) ---");
         
-        System.out.println("\nStarting download sequence...");
-        
-        while (filesDownloaded < TOTAL_FILES) {
-            System.out.println("\n--- CYCLE " + cycle + " ---");
-            
-            // Server A
-            for (int i = 0; i < nA && filesDownloaded < TOTAL_FILES; i++) {
-                String fileName = FILE_PREFIX + String.format("%03d", fileIndex) + FILE_SUFFIX;
-                System.out.print("[A] " + fileName + " -> IP:" + ipA + " -> ");
-                downloadFile("A", ipA, fileName);
-                fileIndex++;
-                filesDownloaded++;
-                filesInCurrentCycle++;
-            }
-            
-            // Server B
-            for (int i = 0; i < nB && filesDownloaded < TOTAL_FILES; i++) {
-                String fileName = FILE_PREFIX + String.format("%03d", fileIndex) + FILE_SUFFIX;
-                System.out.print("[B] " + fileName + " -> IP:" + ipB + " -> ");
-                downloadFile("B", ipB, fileName);
-                fileIndex++;
-                filesDownloaded++;
-                filesInCurrentCycle++;
-            }
-            
-            // Έλεγχος για μετάβαση στον επόμενο κύκλο
-            if (filesInCurrentCycle >= (nA + nB)) {
-                cycle++;
-                filesInCurrentCycle = 0;
-            }
+        // Server A
+        for (int i = 0; i < nA && filesDownloaded < TOTAL_FILES; i++) {
+            String fileName = FILE_PREFIX + String.format("%03d", fileIndex) + FILE_SUFFIX;
+            System.out.print("C" + cycle + "->[A] " + fileName + " (IP:" + ipA + ") -> ");
+            downloadFile("A", ipA, fileName);
+            fileIndex++;
+            filesDownloaded++;
         }
         
-        System.out.println("\n✓ Downloaded " + filesDownloaded + "/" + TOTAL_FILES + " files");
+        // Server B
+        for (int i = 0; i < nB && filesDownloaded < TOTAL_FILES; i++) {
+            String fileName = FILE_PREFIX + String.format("%03d", fileIndex) + FILE_SUFFIX;
+            System.out.print("C" + cycle + "->[B] " + fileName + " (IP:" + ipB + ") -> ");
+            downloadFile("B", ipB, fileName);
+            fileIndex++;
+            filesDownloaded++;
+        }
+        
+        // ΧΡΟΝΟΣ ΚΥΚΛΟΥ
+        long cycleEndTime = System.nanoTime();
+        double cycleTimeSeconds = (cycleEndTime - cycleStartTime) / 1_000_000_000.0;
+        totalCycleTime += cycleTimeSeconds;
+        
+        System.out.printf("--- CYCLE %d COMPLETE: %.3f seconds (Cumulative: %.3f) ---%n", 
+                         cycle, cycleTimeSeconds, totalCycleTime);
+        
+        cycle++;
     }
     
+    System.out.println("\n✓ Downloaded " + filesDownloaded + "/" + TOTAL_FILES + " files");
+    System.out.printf("Sum of all cycle times: %.3f seconds%n", totalCycleTime);
+}
     private static void downloadFile(String serverName, String serverIP, String fileName) 
             throws IOException, ClassNotFoundException {
         
