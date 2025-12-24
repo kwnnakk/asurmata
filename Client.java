@@ -80,7 +80,7 @@ public class Client {
             // Server A
             for (int i = 0; i < nA && filesDownloaded < TOTAL_FILES; i++) {
                 String fileName = FILE_PREFIX + String.format("%03d", fileIndex) + FILE_SUFFIX;
-                System.out.print("[A] " + fileName + " -> ");
+                System.out.print("[A] " + fileName + " -> IP:" + ipA + " -> ");
                 downloadFile("A", ipA, fileName);
                 fileIndex++;
                 filesDownloaded++;
@@ -90,7 +90,7 @@ public class Client {
             // Server B
             for (int i = 0; i < nB && filesDownloaded < TOTAL_FILES; i++) {
                 String fileName = FILE_PREFIX + String.format("%03d", fileIndex) + FILE_SUFFIX;
-                System.out.print("[B] " + fileName + " -> ");
+                System.out.print("[B] " + fileName + " -> IP:" + ipB + " -> ");
                 downloadFile("B", ipB, fileName);
                 fileIndex++;
                 filesDownloaded++;
